@@ -49,19 +49,54 @@ object List { // `List` companion object. Contains functions for creating and wo
   def product2(ns: List[Double]) =
     foldRight(ns, 1.0)(_ * _) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
 
-  def tail[A](l: List[A]): List[A] = ???
+  // 3-2
+  def tail[A](l: List[A]): List[A] = l match {
+    case Nil         => throw new IllegalArgumentException()
+    case Cons(_, xs) => xs
+  }
 
-  def setHead[A](l: List[A], h: A): List[A] = ???
+  // 3-3
+  def setHead[A](l: List[A], h: A): List[A] = l match {
+    case Nil         => throw new IllegalArgumentException()
+    case Cons(_, xs) => Cons(h, xs)
+  }
 
-  def drop[A](l: List[A], n: Int): List[A] = ???
+  // 3-4
+  @scala.annotation.tailrec
+  def drop[A](l: List[A], n: Int): List[A] = (l, n) match {
+    case (_, i) if i < 0  => throw new IllegalArgumentException()
+    case (_, 0)           => l
+    case (Nil, _)         => throw new IllegalArgumentException()
+    case (Cons(_, xs), i) => drop(xs, i - 1)
+  }
 
-  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = ???
+  // 3-5
+  @scala.annotation.tailrec
+  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match {
+    case Cons(x, xs) if !f(x) => dropWhile(xs, f)
+    case _                    => l
+  }
 
-  def init[A](l: List[A]): List[A] = ???
+  // 3-6
+  def init[A](l: List[A]): List[A] = l match {
+    case Cons(_, Nil) => Nil
+    case Cons(x, xs)  => Cons(x, init(xs))
+    case Nil          => throw new IllegalArgumentException()
+  }
 
-  def length[A](l: List[A]): Int = ???
+  def length[A](l: List[A]): Int = l match {
+    case Cons(_, xs) => 1 + length(xs)
+    case Nil         => 0
+  }
 
-  def foldLeft[A, B](l: List[A], z: B)(f: (B, A) => B): B = ???
+  @scala.annotation.tailrec
+  def foldLeft[A, B](l: List[A], z: B)(f: (B, A) => B): B = l match {
+    case Nil         => z
+    case Cons(x, xs) => foldLeft(xs, f(z, x))(f)
+  }
 
-  def map[A, B](l: List[A])(f: A => B): List[B] = ???
+  def map[A, B](l: List[A])(f: A => B): List[B] = l match {
+    case Nil         => Nil
+    case Cons(x, xs) => Cons(f(x), map(xs)(f))
+  }
 }
